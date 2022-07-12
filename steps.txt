@@ -1,0 +1,3 @@
+refer to this for deploying OTel collector and sample application on kubernetes.
+
+https://medium.com/opentelemetry/deploying-the-opentelemetry-collector-on-kubernetes-2256eca569c9

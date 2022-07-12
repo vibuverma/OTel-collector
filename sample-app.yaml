@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+  namespace: otel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: myapp
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: myapp
+    spec:
+      tolerations:
+      - effect: NoSchedule
+        key: cattle.io/os
+        operator: Equal
+        value: linux
+      containers:
+      - name: myapp
+        image: quay.io/jpkroehling/generate-span-java:0.1.0
+        resources:
+          limits:
+            cpu: 200m
+            memory: 500Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+      - name: agent
+        image: otel/opentelemetry-collector:0.18.0
+        args:
+        - --config=/conf/agent.yaml
+        resources:
+            limits:
+              cpu: 200m
+              memory: 500Mi
+            requests:
+              cpu: 100m
+              memory: 200Mi
+        volumeMounts:
+        - mountPath: /conf
+          name: agent-config
+      volumes:
+      - configMap:
+          items:
+          - key: agent.yaml
+            path: agent.yaml
+          name: agent-config
+        name: agent-config
