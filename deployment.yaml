@@ -1,17 +1,22 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: opentelemetrycollector
+  name: otel-collector
   namespace: otel
+  labels:
+    app: opentelemetry
+    component: otel-collector
 spec:
-  replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: opentelemetrycollector
+      app: opentelemetry
+      component: otel-collector
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: opentelemetrycollector
+        app: opentelemetry
+        component: otel-collector
     spec:
       tolerations:
       - effect: NoSchedule
@@ -19,24 +24,42 @@ spec:
         operator: Equal
         value: linux
       containers:
-      - name: otelcol
-        args:
-        - --config=/conf/collector.yaml
-        image: otel/opentelemetry-collector:0.18.0
-        volumeMounts:
-        - mountPath: /conf
-          name: collector-config
+      - name: otel-collector
+        image: otel/opentelemetry-collector-contrib-dev:latest
+        ports:
+          - containerPort: 8888
+            name: metrics
+          - containerPort: 55680
+            name: grpc
+          - containerPort: 55681 # Default endpoint for OpenTelemetry receiver.
+            name: http
         resources:
-            limits:
-              cpu: 200m
-              memory: 500Mi
-            requests:
-              cpu: 100m
-              memory: 200Mi
+          limits:
+            cpu: 100m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        volumeMounts:
+        - mountPath: /var/log
+          name: varlog
+          readOnly: true
+        - mountPath: /var/lib/docker/containers
+          name: varlibdockercontainers
+          readOnly: true
+        - mountPath: /etc/otel/config.yaml
+          name: data
+          subPath: config.yaml
+          readOnly: true
+      terminationGracePeriodSeconds: 30
       volumes:
-      - configMap:
-          items:
-          - key: collector.yaml
-            path: collector.yaml
-          name: collector-config
-        name: collector-config
+      - name: varlog
+        hostPath:
+          path: /var/log
+      - name: varlibdockercontainers
+        hostPath:
+          path: /var/lib/docker/containers
+      - name: data
+        configMap:
+          name: otel-collector-config
+---

@@ -2,43 +2,55 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: collector-config
+  name: otel-collector-config
   namespace: otel
 data:
-  collector.yaml: |
+  config.yaml: |-
     receivers:
       otlp:
-        protocols: 
+        protocols:
           grpc:
+            endpoint: 0.0.0.0:55680
+          http:
+            endpoint: 0.0.0.0:55681
+
+      hostmetrics:
+        collection_interval: 1m
+        scrapers:
+          cpu:
+          load:
+          memory:
+
     processors:
+      batch: null
+
     exporters:
+      elastic:
+        apm_server_url: 'http://192.168.0.147:31436'
       logging:
+        loglevel: DEBUG
+
+    extensions:
+      health_check:
+
     service:
       pipelines:
+
+        metrics:
+          receivers:
+            - otlp
+            - hostmetrics
+          exporters:
+            - logging
+            - elastic
+
         traces:
-          receivers: [otlp]
-          processors: []
-          exporters: [logging]
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: agent-config
-  namespace: otel
-data:
-  agent.yaml: |
-    receivers:
-      otlp:
-        protocols: 
-          grpc:
-    processors:
-    exporters:
-      otlp:
-        endpoint: "opentelemetrycollector.default.svc.cluster.local:4317"
-        insecure: true
-    service:
-      pipelines:
-        traces:
-          receivers: [otlp]
-          processors: []
-          exporters: [otlp]
+          receivers:
+            - otlp
+
+          processors:
+            - batch
+            
+          exporters:
+            - elastic
+            - logging
