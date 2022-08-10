@@ -13,7 +13,6 @@ data:
             endpoint: 0.0.0.0:55680
           http:
             endpoint: 0.0.0.0:55681
-
       hostmetrics:
         collection_interval: 1m
         scrapers:
@@ -22,11 +21,17 @@ data:
           memory:
 
     processors:
-      batch: null
+      batch: 
+        timeout: 1m
 
     exporters:
       elastic:
         apm_server_url: 'http://192.168.0.147:31436'
+      jaeger:
+        endpoint: "http://192.168.0.147:32427" 
+        tls:
+          insecure: true
+
       logging:
         loglevel: DEBUG
 
@@ -53,4 +58,5 @@ data:
             
           exporters:
             - elastic
+            - jaeger
             - logging
