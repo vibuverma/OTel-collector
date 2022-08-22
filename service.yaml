@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: otel-collector
+  namespace: otel
   labels:
     app: opentelemetry
     component: otel-collector
@@ -10,13 +11,13 @@ spec:
   - name: metrics # Default endpoint for querying metrics.
     port: 8888
   - name: grpc # Default endpoint for OpenTelemetry receiver.
-    port: 55680
+    port: 4317
     protocol: TCP
-    targetPort: 55680
+    targetPort: 4317
   - name: http # Default endpoint for OpenTelemetry receiver.
-    port: 55681
+    port: 4318
     protocol: TCP
-    targetPort: 55681
+    targetPort: 4318
   selector:
     component: otel-collector
   sessionAffinity: None

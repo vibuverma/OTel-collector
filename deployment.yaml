@@ -29,9 +29,9 @@ spec:
         ports:
           - containerPort: 8888
             name: metrics
-          - containerPort: 55680
+          - containerPort: 4317
             name: grpc
-          - containerPort: 55681 # Default endpoint for OpenTelemetry receiver.
+          - containerPort: 4318 # Default endpoint for OpenTelemetry receiver.
             name: http
         resources:
           limits:

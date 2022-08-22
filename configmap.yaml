@@ -10,9 +10,13 @@ data:
       otlp:
         protocols:
           grpc:
-            endpoint: 0.0.0.0:55680
+            # endpoint: 0.0.0.0:55680
+            # tls:
+            #   insecure: true
           http:
-            endpoint: 0.0.0.0:55681
+            # endpoint: 0.0.0.0:55681
+            # tls:
+            #   insecure: true
       hostmetrics:
         collection_interval: 1m
         scrapers:
