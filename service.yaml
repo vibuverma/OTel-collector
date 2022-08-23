@@ -13,11 +13,11 @@ spec:
   - name: grpc # Default endpoint for OpenTelemetry receiver.
     port: 4317
     protocol: TCP
-    targetPort: 4317
-  - name: http # Default endpoint for OpenTelemetry receiver.
-    port: 4318
-    protocol: TCP
-    targetPort: 4318
+    # targetPort: 4317
+  # - name: http # Default endpoint for OpenTelemetry receiver.
+  #   port: 4318
+  #   protocol: TCP
+  #   targetPort: 4318
   selector:
     component: otel-collector
   sessionAffinity: None
